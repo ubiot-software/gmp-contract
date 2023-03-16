@@ -16,6 +16,7 @@ contract GMP {
 
     // Event emitted when a sucessfully transfer ocurr
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
+
     // Event emitted when a sucessfully approval
     event Approval(
         address indexed _owner,
@@ -23,7 +24,6 @@ contract GMP {
         uint256 _value
     );
 
-    // ------------------------------------------- Second contract -------------------------------------------
     // Struct of an actor of the network
     struct Person {
         string _name;
@@ -40,8 +40,10 @@ contract GMP {
 
     // Mapping the addresses with the people of the network
     mapping(address => Person) public people;
+
     // Mapping to ad an ID to the sales of the network
     mapping(uint256 => Sale) public sales;
+
     // Count of the sales in the network
     uint256 public salesCount;
 
@@ -62,10 +64,10 @@ contract GMP {
     }
 
     // Function to transfer tokens
-    function transfer(address _to, uint256 _value)
-        public
-        returns (bool success)
-    {
+    function transfer(
+        address _to,
+        uint256 _value
+    ) public returns (bool success) {
         require(
             _value <= balances[msg.sender],
             "There are not enough funds to do the transfer"
@@ -77,21 +79,20 @@ contract GMP {
     }
 
     // Function that allows to a user transact with the token
-    function approve(address _spender, uint256 _value)
-        public
-        returns (bool success)
-    {
+    function approve(
+        address _spender,
+        uint256 _value
+    ) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         success = true;
     }
 
     // Function to check the allowance of a specific user
-    function allowance(address _owner, address _spender)
-        public
-        view
-        returns (uint256 remaining)
-    {
+    function allowance(
+        address _owner,
+        address _spender
+    ) public view returns (uint256 remaining) {
         remaining = allowed[_owner][_spender];
     }
 
@@ -114,7 +115,6 @@ contract GMP {
         success = true;
     }
 
-    // ------------------------------------------- Second contract -------------------------------------------
     // Function to register a new person in the network
     function registerPerson(string memory _name) public {
         people[msg.sender] = Person(_name, msg.sender);
@@ -154,5 +154,25 @@ contract GMP {
         // Mark the sale as sold
         sale.isSold = true;
         success = true;
+    }
+
+    // Function to burn some tokens
+    function burn(address account, uint256 amount) public {
+        require(account != address(0), "ERC20: burn from the zero address");
+        // TODO
+        // Only owner
+        // require(msg.sender === _owner, "Only owner can use this function");
+
+        // _beforeTokenTransfer(account, address(0), amount);
+
+        uint256 accountBalance = balances[account];
+        require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+        unchecked {
+            balances[account] = accountBalance - amount;
+            // Overflow not possible: amount <= accountBalance <= totalSupply.
+            _totalSupply -= amount;
+        }
+
+        emit Transfer(account, address(0), amount);
     }
 }
