@@ -3,7 +3,7 @@ const deploy = async () => {
   console.log("Deploying contract from the account:", deployer.address);
 
   const GMP = await ethers.getContractFactory("GMP");
-  const deployed = await GMP.deploy(1000);
+  const deployed = await GMP.deploy();
   console.log("GMP is deployed at:", deployed.address);
 };
 
